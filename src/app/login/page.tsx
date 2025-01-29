@@ -99,7 +99,7 @@ const LoginPage = () => {
                     <p className="text-sm text-gray-600">
                         Esqueci a minha senha.{' '}
                         <a
-                            href="/redefine-password"
+                            href="/forget-password"
                             className="text-blue-500 hover:underline"
                         >
                             Clique aqui para redefinir.

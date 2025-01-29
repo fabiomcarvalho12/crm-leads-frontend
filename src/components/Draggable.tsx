@@ -1,3 +1,5 @@
+"use client";
+
 import { useDraggable } from "@dnd-kit/core";
 
 export const Draggable = ({ id, children }: { id: string; children: React.ReactNode }) => {

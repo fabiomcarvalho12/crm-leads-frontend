@@ -1,23 +1,17 @@
-"use client";
-
 import { useState, useEffect } from "react";
-import TaskModal from "./TaskModal"; // Ensure to import TaskModal
-import ReadMoreIcon from '@mui/icons-material/ReadMore'; // Import ReadMoreIcon from Material-UI
+import { useDraggable } from "@dnd-kit/core";
+import TaskModal from "./TaskModal";
+import ReadMoreIcon from "@mui/icons-material/ReadMore";
 
 interface TaskCardProps {
-  task: { id: string; name: string }; // Accepting task prop with id and name
+  task: { id: string; name: string };
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task }) => { // Destructuring 'task' prop
+const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState<string>("");
-  const [isClient, setIsClient] = useState(false); // State to track if the component is rendered in the client
 
   useEffect(() => {
-    // Set to true once the component is mounted on the client-side
-    setIsClient(true);
-    
-    // Ensure a valid URL is set for the profile image
     const url = "https://randomuser.me/api/portraits/men/64.jpg";
     setProfileImageUrl(url);
   }, []);
@@ -28,21 +22,26 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => { // Destructuring 'task
 
   const handleCloseModal = () => setIsModalOpen(false);
 
-  // Fallback URL for profile image in case it fails to load
-  const fallbackImageUrl = "https://via.placeholder.com/150"; // Placeholder image
+  const fallbackImageUrl = "https://via.placeholder.com/150";
 
-  // Prevent rendering the modal during SSR (Server-Side Rendering)
-  if (!isClient) return null; // Don't render the component during SSR
+  // Use Draggable para evitar transparência ao arrastar
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: task.id });
 
   return (
     <>
-      <div className="relative p-4 flex flex-col space-y-3 min-h-[150px] w-[250px] border rounded-lg shadow-md">
+      <div
+        ref={setNodeRef}
+        {...attributes}
+        {...listeners}
+        className={`relative p-4 flex flex-col space-y-3 min-h-[150px] w-[250px] border rounded-lg shadow-md transition-all 
+        ${isDragging ? "opacity-100 !shadow-lg scale-105" : "opacity-100"}`}
+      >
         {/* Contact Information */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full border border-green-600 overflow-hidden">
               <img
-                src={profileImageUrl || fallbackImageUrl} // Fallback to placeholder if URL is empty
+                src={profileImageUrl || fallbackImageUrl}
                 alt="Profile"
                 className="rounded-full"
                 width={40}
@@ -69,13 +68,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => { // Destructuring 'task
           </span>
 
           <ReadMoreIcon
-            onClick={handleOpenModal} // Open modal on click
-            className="text-blue-600 cursor-pointer" // Styling for the icon
+            onClick={handleOpenModal}
+            className="text-blue-600 cursor-pointer"
           />
         </div>
       </div>
 
-      {isModalOpen && <TaskModal onClose={handleCloseModal} task={task} />} {/* Passing the task object */}
+      {isModalOpen && <TaskModal onClose={handleCloseModal} task={task} />}
     </>
   );
 };
